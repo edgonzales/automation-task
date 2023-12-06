@@ -1,7 +1,8 @@
 # Automation Task
 
 Runnable on: Windows OS
-Browser: Preferably: Chrome
+
+Browser: Chrome
 
 Stack
 - NodeJS
@@ -10,6 +11,6 @@ Stack
 
 Instructions
 - Download VS Code
-- Download VS Code plugin: Playwright Test for VS Code (https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright)
+- Download [VS Code plugin: Playwright Test for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright)
 - Press the 'Play' button
-<img src="https://i.imgur.com/GgMwaIC.png">
+<img src="https://i.imgur.com/6YYdSYE.png">
