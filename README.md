@@ -17,7 +17,7 @@ Instructions
 
 Refactor Opportunities
 - Parametize the automation using https://playwright.dev/docs/test-parameterize and https://www.npmjs.com/package/csv-parse
-- Check the titles for each product and assert that they include the search term
+- Check the titles for each product of each page result and assert that they include the search term
 - Some products do not increasing the quantity more than 3. Apply conditional logic to check for this.
 - Apply POM, creating pages and components
 - Fix the for loop bug where the soft assertion stops the test from running
