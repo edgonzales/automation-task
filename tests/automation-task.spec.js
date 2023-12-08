@@ -29,15 +29,15 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
   const itemTitles = page.locator('css=.s-item__title');
 
   // BUG! loop through each title on the page and soft asserts whether it contains the product name
-  // for (const itemTitle of await itemTitles.all())
-  //   expect.soft(itemTitle).toContainText('PRODUCT_NAME[0]')
+  for (const itemTitle of await itemTitles.all())
+    expect.soft(itemTitle).toContainText(PRODUCT_NAME[0])
 
   // navigate to the last results page 
   const lastPageResults = page.locator('css=.pagination__items li').last();
 
   // BUG! loop through each title on the page and soft asserts whether it contains the product name
-  // for (const itemTitle of await itemTitles.all())
-  //   expect.soft(itemTitle).toContainText(PRODUCT_NAME[0])
+  for (const itemTitle of await itemTitles.all())
+    expect.soft(itemTitle).toContainText(PRODUCT_NAME[0])
 
   // navigate to the last page of the results
   await lastPageResults.click();
@@ -67,7 +67,7 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
   const updatedItemPriceFloat = parseFloat(updatedItemPriceStr);
 
   // assertion to confirm the math of when quantity is updated, the price is updated accordingly
-  console.log(`The default item price is ${defaultItemPriceFloat}, and the updated item price is ${updatedItemPriceFloat}`);
+  console.log(`The default item price is $${defaultItemPriceFloat}, and the updated item price is $${updatedItemPriceFloat}.`);
   expect(updatedItemPriceFloat).toBe(defaultItemPriceFloat * QUANTITY[4]);
   page.close()
 
