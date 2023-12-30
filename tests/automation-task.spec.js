@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
+import exp from 'constants';
 
 // ~~~~~~~~ CONSTANTS ~~~~~~~~
 const PRODUCT_NAME = [
-  'Socks',
-  'Pant'
+  'socks',
 ];
 
 const QUANTITY = [1, 2, 3, 4, 5];
@@ -19,7 +19,8 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
 
   // navigate and search for Product Name
   await page.getByRole('link', { name: 'Brand Outlet' }).first().click();
-  await page.getByRole('button', { name: 'Clothing' }).click();
+  // BUG! Clothing accordian does not expand upon click.
+  await page.getByRole('button', { name: 'Clothing' }).dblclick();
   await page.getByLabel('Side Refine Panel').getByRole('link', { name: 'Champion' }).click();
   await page.getByPlaceholder('Search Up to 40% off Champion').click();
   await page.getByPlaceholder('Search Up to 40% off Champion').fill(PRODUCT_NAME[0]);
@@ -27,22 +28,23 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
 
   // element representing each item's title
   const itemTitles = page.locator('css=.s-item__title');
+  const nextPageIcon = page.locator('css=.icon--arrow-right-16');
+  const nextPageBtn = page.locator('css=.pagination__next');
+  //const nextPageBtn1 = page.locator(getByLabel('Go to next search page'));
 
-  // BUG! loop through each title on the page and soft asserts whether it contains the product name
-  for (const itemTitle of await itemTitles.all())
-    expect.soft(itemTitle).toContainText(PRODUCT_NAME[0])
-
-  // navigate to the last results page 
-  const lastPageResults = page.locator('css=.pagination__items li').last();
-
-  // BUG! loop through each title on the page and soft asserts whether it contains the product name
-  for (const itemTitle of await itemTitles.all())
-    expect.soft(itemTitle).toContainText(PRODUCT_NAME[0])
-
-  // navigate to the last page of the results
-  await lastPageResults.click();
-
-  // click on the last item title
+  // DO: iterate through each item title, lower case it, and then assert whether it contains the product name 
+  // WHILE: next page btn is not disabled
+  // BUG! for loop is iterating through items that are not part of the results screen 
+  do {
+    for (const itemTitle of await itemTitles.all()) {
+      const lowerCaseText = await itemTitle.innerText().then(text => text.toLowerCase());
+      expect.soft(lowerCaseText).toContain(PRODUCT_NAME[0]);
+    }
+    expect.soft(nextPageIcon).toBeAttached();
+    await nextPageIcon.click();
+  }
+  while (!nextPageBtn.isDisabled()) {
+  }
   await itemTitles.last().click();
 
   // add item to cart
@@ -69,6 +71,7 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
   // assertion to confirm the math of when quantity is updated, the price is updated accordingly
   console.log(`The default item price is $${defaultItemPriceFloat}, and the updated item price is $${updatedItemPriceFloat}.`);
   expect(updatedItemPriceFloat).toBe(defaultItemPriceFloat * QUANTITY[4]);
+
   page.close()
 
 });
