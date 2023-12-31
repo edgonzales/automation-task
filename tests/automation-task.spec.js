@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import exp from 'constants';
 
 // ~~~~~~~~ CONSTANTS ~~~~~~~~
 const PRODUCT_NAME = [
@@ -13,24 +12,25 @@ const QUANTITY = [1, 2, 3, 4, 5];
 // ~~~~~~~~ TEST ~~~~~~~~
 test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
 
+  const clothingDropDwn = page.getByRole('button', { name: 'Clothing' });
+  const sideRefinePanelChampion = page.getByLabel('Side Refine Panel').getByRole('link', { name: 'Champion' });
+  const itemTitles = page.locator('css=.s-item__title');
+  const nextPageIcon = page.locator('css=.icon--arrow-right-16');
+  const nextPageBtn = page.locator('css=.pagination__next');
+
   // Go to URL, then assert that Chrome goes to the correct URL
   await page.goto('https://www.ebay.com/');
   await expect(page).toHaveURL(/.*ebay/);
 
   // navigate and search for Product Name
   await page.getByRole('link', { name: 'Brand Outlet' }).first().click();
-  // BUG! Clothing accordian does not expand upon click.
-  await page.getByRole('button', { name: 'Clothing' }).dblclick();
-  await page.getByLabel('Side Refine Panel').getByRole('link', { name: 'Champion' }).click();
+  await page.waitForLoadState();
+
+  await clothingDropDwn.click();
+  await sideRefinePanelChampion.click();
   await page.getByPlaceholder('Search Up to 40% off Champion').click();
   await page.getByPlaceholder('Search Up to 40% off Champion').fill(PRODUCT_NAME[0]);
   await page.getByPlaceholder('Search Up to 40% off Champion').press('Enter');
-
-  // element representing each item's title
-  const itemTitles = page.locator('css=.s-item__title');
-  const nextPageIcon = page.locator('css=.icon--arrow-right-16');
-  const nextPageBtn = page.locator('css=.pagination__next');
-  //const nextPageBtn1 = page.locator(getByLabel('Go to next search page'));
 
   // DO: iterate through each item title, lower case it, and then assert whether it contains the product name 
   // WHILE: next page btn is not disabled
@@ -55,6 +55,7 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
   const defaultItemPriceElm = await page.locator('css=.price-details').first().innerText();
   const defaultItemPriceStr = defaultItemPriceElm.replace("$", "");
   const defaultItemPriceFloat = parseFloat(defaultItemPriceStr);
+  await page.waitForLoadState();
 
   // updates the quantity on the drop down to 5, in this example
   const quantityDropDown = page.locator('[data-test-id="list-summary"]').getByRole('combobox')
@@ -62,6 +63,8 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
 
   // wait for 1.5 second
   await page.waitForTimeout(1500);
+  // await quantityDropDown.waitFor('attached');
+  // await page.waitForLoadState();
 
   // grab item price, removes the $, and converts it to a float
   const updatedItemPriceElm = await page.locator('css=.price-details').first().innerText();
