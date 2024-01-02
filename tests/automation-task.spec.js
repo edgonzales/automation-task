@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // ~~~~~~~~ CONSTANTS ~~~~~~~~
 const PRODUCT_NAME = [
-  'socks',
+  'shorts',
 ];
 
 const QUANTITY = [1, 2, 3, 4, 5];
@@ -15,8 +15,8 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
   const clothingDropDwn = page.getByRole('button', { name: 'Clothing' });
   const sideRefinePanelChampion = page.getByLabel('Side Refine Panel').getByRole('link', { name: 'Champion' });
   const itemTitles = page.locator('css=.s-item__title');
-  const nextPageIcon = page.locator('css=.icon--arrow-right-16');
-  const nextPageBtn = page.locator('css=.pagination__next');
+  const paginationItems = page.locator('css=.pagination__items li');
+  const lastPaginationItem = page.getByRole('link', { name: '6' });
 
   // Go to URL, then assert that Chrome goes to the correct URL
   await page.goto('https://www.ebay.com/');
@@ -32,20 +32,21 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
   await page.getByPlaceholder('Search Up to 40% off Champion').fill(PRODUCT_NAME[0]);
   await page.getByPlaceholder('Search Up to 40% off Champion').press('Enter');
 
-  // DO: iterate through each item title, lower case it, and then assert whether it contains the product name 
-  // WHILE: next page btn is not disabled
-  // BUG! for loop is iterating through items that are not part of the results screen 
-  do {
+  // nested for loop to include getting to the next page and checking that item
+  // titles contain the product name
+  for (const paginationItem of await paginationItems.all()) {
+    await page.waitForLoadState();
+    console.log('These are the pagination items: ', await paginationItem.innerText());
     for (const itemTitle of await itemTitles.all()) {
       const lowerCaseText = await itemTitle.innerText().then(text => text.toLowerCase());
       expect.soft(lowerCaseText).toContain(PRODUCT_NAME[0]);
     }
-    expect.soft(nextPageIcon).toBeAttached();
-    await nextPageIcon.click();
+    await paginationItem.click();
   }
-  while (!nextPageBtn.isDisabled()) {
-  }
+
   await itemTitles.last().click();
+
+
 
   // add item to cart
   await page.getByTestId('x-atc-action').getByTestId('ux-call-to-action').click();
