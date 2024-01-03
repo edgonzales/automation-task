@@ -15,8 +15,6 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
   const clothingDropDwn = page.getByRole('button', { name: 'Clothing' });
   const sideRefinePanelChampion = page.getByLabel('Side Refine Panel').getByRole('link', { name: 'Champion' });
   const itemTitles = page.locator('css=.s-item__title');
-  const paginationItems = page.locator('css=.pagination__items li');
-  const lastPaginationItem = page.getByRole('link', { name: '6' });
 
   // Go to URL, then assert that Chrome goes to the correct URL
   await page.goto('https://www.ebay.com/');
@@ -34,18 +32,20 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
 
   // nested for loop to include getting to the next page and checking that item
   // titles contain the product name
+  await page.waitForTimeout(1500);
+
+  const paginationItems = page.locator('nav ol li .pagination__item');
+
   for (const paginationItem of await paginationItems.all()) {
     await page.waitForLoadState();
-    console.log('These are the pagination items: ', await paginationItem.innerText());
     for (const itemTitle of await itemTitles.all()) {
       const lowerCaseText = await itemTitle.innerText().then(text => text.toLowerCase());
       expect.soft(lowerCaseText).toContain(PRODUCT_NAME[0]);
     }
+    await page.waitForLoadState();
     await paginationItem.click();
   }
-
   await itemTitles.last().click();
-
 
 
   // add item to cart
@@ -64,8 +64,8 @@ test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
 
   // wait for 1.5 second
   await page.waitForTimeout(1500);
-  // await quantityDropDown.waitFor('attached');
-  // await page.waitForLoadState();
+  await quantityDropDown.waitFor('attached');
+  await page.waitForLoadState();
 
   // grab item price, removes the $, and converts it to a float
   const updatedItemPriceElm = await page.locator('css=.price-details').first().innerText();
