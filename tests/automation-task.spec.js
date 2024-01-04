@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // ~~~~~~~~ CONSTANTS ~~~~~~~~
 const PRODUCT_NAME = [
-  'shorts',
+  'crocs',
 ];
 
 const QUANTITY = [1, 2, 3, 4, 5];
@@ -11,31 +11,28 @@ const QUANTITY = [1, 2, 3, 4, 5];
 
 // ~~~~~~~~ TEST ~~~~~~~~
 test('verifyAddToCartWorkflow - Socks', async ({ page }) => {
-
-  const clothingDropDwn = page.getByRole('button', { name: 'Clothing' });
-  const sideRefinePanelChampion = page.getByLabel('Side Refine Panel').getByRole('link', { name: 'Champion' });
-  const itemTitles = page.locator('css=.s-item__title');
-
+  
   // Go to URL, then assert that Chrome goes to the correct URL
   await page.goto('https://www.ebay.com/');
   await expect(page).toHaveURL(/.*ebay/);
-
+  
   // navigate and search for Product Name
   await page.getByRole('link', { name: 'Brand Outlet' }).first().click();
   await page.waitForLoadState();
 
-  await clothingDropDwn.click();
-  await sideRefinePanelChampion.click();
-  await page.getByPlaceholder('Search Up to 40% off Champion').click();
-  await page.getByPlaceholder('Search Up to 40% off Champion').fill(PRODUCT_NAME[0]);
-  await page.getByPlaceholder('Search Up to 40% off Champion').press('Enter');
-
+  await page.getByRole('button', { name: 'Footwear' }).click();
+  await page.getByRole('link', { name: 'Crocs', exact: true }).click();
+  await page.getByPlaceholder('Search Up to 50% off Crocs').click();
+  await page.getByPlaceholder('Search Up to 50% off Crocs').fill(PRODUCT_NAME[0]);
+  await page.getByPlaceholder('Search Up to 50% off Crocs').press('Enter');
+  
   // nested for loop to include getting to the next page and checking that item
   // titles contain the product name
   await page.waitForTimeout(1500);
-
+  
   const paginationItems = page.locator('nav ol li .pagination__item');
-
+  const itemTitles = page.locator('css=.s-item__title');
+  
   for (const paginationItem of await paginationItems.all()) {
     await page.waitForLoadState();
     for (const itemTitle of await itemTitles.all()) {
