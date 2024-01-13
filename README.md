@@ -1,5 +1,8 @@
 # Automation Task
 
+Overview
+An eCommerce add-product-to-cart e2e test with assertions.
+
 Runnable on: Windows OS
 
 Browser: Chrome
